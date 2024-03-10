@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "896942925082",
+    "project_id": "factoriaproyectosfp24-d6e3d",
+    "storage_bucket": "factoriaproyectosfp24-d6e3d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:896942925082:android:dbb524d2c8b987aaf978a3",
+        "android_client_info": {
+          "package_name": "com.dam2jms.factoriaproyectosfp24retrofit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFxGiwQu6W8QqQBrGOSbSco321p_P9TLQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

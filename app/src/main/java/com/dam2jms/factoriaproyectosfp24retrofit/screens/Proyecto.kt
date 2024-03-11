@@ -1,10 +1,9 @@
 package com.dam2jms.factoriaproyectosfp24retrofit.screens
 
-import kotlinx.serialization.Serializable
+import com.google.firebase.firestore.PropertyName
 
-@Serializable
 data class Proyecto(
-    val proyecto: String,
-    val centro: String,
-    val responsable: String
+    @get:PropertyName("proyecto") @set:PropertyName("proyecto") var proyecto: String = "",
+    @get:PropertyName("centro") @set:PropertyName("centro") var centro: String = "",
+    @get:PropertyName("responsable") @set:PropertyName("responsable") var responsable: String = ""
 )

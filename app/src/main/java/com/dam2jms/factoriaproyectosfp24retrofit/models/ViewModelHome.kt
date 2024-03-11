@@ -1,24 +1,25 @@
 package com.dam2jms.factoriaproyectosfp24retrofit.models
 
-import android.content.Context
-import android.widget.Toast
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.dam2jms.factoriaproyectosfp24retrofit.screens.Proyecto
-import com.dam2jms.factoriaproyectosfp24retrofit.screens.RetrofitServiceFactory
 import com.dam2jms.factoriaproyectosfp24retrofit.states.UiState
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import java.util.UUID
+import kotlinx.coroutines.tasks.await
 
-class ViewModelHome : ViewModel() {
+
+/*class ViewModelHome : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    private val _agregarProyectoResult = MutableLiveData<Boolean>()
+    val agregarProyectoResult: LiveData<Boolean> get() = _agregarProyectoResult
 
     val service = RetrofitServiceFactory.makeRetrofitService()
 
@@ -28,17 +29,49 @@ class ViewModelHome : ViewModel() {
         }
     }
 
-    suspend fun agregarProyecto(uiState: UiState) {
-        val proyecto = Proyecto(
-            proyecto = uiState.proyecto,
-            centro = uiState.centro,
-            responsable = uiState.responsable
-        )
 
+    suspend fun agregarProyecto(proyecto: Proyecto) {
         try {
             service.createProyecto(proyecto)
+            _agregarProyectoResult.postValue(true)
         } catch (e: Exception) {
-            // Handle the exception
+            _agregarProyectoResult.postValue(false)
+            // Manejar errores
         }
     }
+}*/
+
+class ViewModelHome : ViewModel() {
+
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = _uiState
+
+    // Inicializo el Firestore
+    private val db = Firebase.firestore
+
+    fun onChangeAñadir(proyecto: String, centro: String, responsable: String) {
+        // Actualiza el estado directamente utilizando la función update
+        _uiState.update { currentState ->
+            currentState.copy(proyecto = proyecto, centro = centro, responsable = responsable)
+        }
+    }
+
+    suspend fun leerProyectos(): List<Proyecto> {
+        return try {
+            val proyectos = Firebase.firestore.collection("proyectos").get().await()
+            proyectos.toObjects<Proyecto>()
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+            emptyList()
+        }
+    }
+
+    suspend fun agregarProyecto(proyecto: Proyecto) {
+        try {
+            Firebase.firestore.collection("proyectos").add(proyecto).await()
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
+    }
+
 }

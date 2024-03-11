@@ -38,22 +38,24 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.dam2jms.factoriaproyectosfp24retrofit.models.ViewModelHome
 import com.dam2jms.factoriaproyectosfp24retrofit.navigation.AppScreens
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class)
+/*@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController, mvvm: ViewModelHome) {
     val service = RetrofitServiceFactory.makeRetrofitService()
     var proyectos by remember { mutableStateOf(mutableListOf<Proyecto>()) }
 
     //llamar a la API al iniciar la pantalla
-    LaunchedEffect(Unit) {
+    /*LaunchedEffect(Unit) {
         val listProjects = service.listData()
         proyectos = listProjects.toMutableList()
-    }
+    }*/
 
     Scaffold(
         topBar = {
@@ -112,5 +114,73 @@ fun homeScreenBody(modifier: Modifier, navController: NavController, mvvm: ViewM
             }
         }
     }
+}*/
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreen(navController: NavController, mvvm: ViewModelHome) {
+    var proyectos by remember { mutableStateOf<List<Proyecto>>(emptyList()) }
+    val uiState by mvvm.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        proyectos = mvvm.leerProyectos()
+    }
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(text = "Factoría de Proyectos") },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                ),
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Atrás")
+                    }
+                }
+            )
+        },
+        bottomBar = {
+            BottomAppBar {
+                Button(onClick = { navController.navigate(route = AppScreens.AñadirProyecto.route) }) {
+                    Text("Añadir")
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(onClick = { /* código para eliminar un proyecto en el servidor */ }) {
+                    Text("Eliminar")
+                }
+            }
+        }
+    ) { paddingValues ->
+        homeScreenBody(modifier = Modifier.padding(paddingValues), navController, mvvm, proyectos)
+    }
 }
 
+@Composable
+fun homeScreenBody(modifier: Modifier, navController: NavController, mvvm: ViewModelHome, proyectos: List<Proyecto>) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        LazyColumn {
+            items(proyectos.size) { proyecto ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(text = "Proyecto: ${proyectos[proyecto].proyecto}")
+                        Text(text = "Centro: ${proyectos[proyecto].centro}")
+                        Text(text = "Responsable: ${proyectos[proyecto].responsable}")
+                    }
+                }
+            }
+        }
+    }
+}

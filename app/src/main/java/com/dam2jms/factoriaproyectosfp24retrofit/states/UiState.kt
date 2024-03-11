@@ -1,5 +1,6 @@
 package com.dam2jms.factoriaproyectosfp24retrofit.states
 
+import com.dam2jms.factoriaproyectosfp24retrofit.screens.Proyecto
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -12,5 +13,6 @@ data class UiState(
 
     var proyecto: String = "",
     var centro: String = "",
-    var responsable: String = ""
+    var responsable: String = "",
+    var listaProyectos: List<Proyecto> = listOf()
 )

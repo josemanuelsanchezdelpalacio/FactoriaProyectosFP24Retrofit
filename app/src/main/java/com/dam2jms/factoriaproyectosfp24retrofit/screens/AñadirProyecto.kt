@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,12 +59,12 @@ fun AñadirProyecto(navController: NavController, mvvm: ViewModelHome) {
             )
         },
     ) { paddingValues ->
-        añadirProyectoBody(modifier = Modifier.padding(paddingValues), mvvm, uiState)
+        añadirProyectoBody(modifier = Modifier.padding(paddingValues), navController, mvvm, uiState)
     }
 }
 
 @Composable
-fun añadirProyectoBody(modifier: Modifier, mvvm: ViewModelHome, uiState: UiState) {
+fun añadirProyectoBody(modifier: Modifier, navController: NavController, mvvm: ViewModelHome, uiState: UiState) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -99,10 +100,14 @@ fun añadirProyectoBody(modifier: Modifier, mvvm: ViewModelHome, uiState: UiStat
 
         Button(
             onClick = {
-                // Use coroutine scope to call the suspend function
-                CoroutineScope(Dispatchers.IO).launch {
-                    mvvm.agregarProyecto(uiState)
-                }
+                //creo un nuevo proyecto con los datos de los EditText
+                val nuevoProyecto = Proyecto(
+                    proyecto = uiState.proyecto,
+                    centro = uiState.centro,
+                    responsable = uiState.responsable
+                )
+
+                mvvm.agregarProyecto(nuevoProyecto)
             },
             modifier = Modifier.padding(16.dp)
         ) {
@@ -110,3 +115,67 @@ fun añadirProyectoBody(modifier: Modifier, mvvm: ViewModelHome, uiState: UiStat
         }
     }
 }
+
+
+/*@Composable
+fun añadirProyectoBody(modifier: Modifier, navController: NavController, mvvm: ViewModelHome, uiState: UiState) {
+
+    //observo el resultado y navega hacia atras si es exitoso
+    val agregarProyectoResult by mvvm.agregarProyectoResult.observeAsState()
+
+    //compruebo el resultado y navega hacia atrás si es exitoso
+    agregarProyectoResult?.let { resultado ->
+        if (resultado) {
+            navController.navigateUp()
+        } else { }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        OutlinedTextField(
+            value = uiState.proyecto,
+            onValueChange = { mvvm.onChangeAñadir(it, uiState.centro, uiState.responsable) },
+            label = { Text("Nombre del Proyecto") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+
+        OutlinedTextField(
+            value = uiState.centro,
+            onValueChange = { mvvm.onChangeAñadir(uiState.proyecto, it, uiState.responsable) },
+            label = { Text("Centro del Proyecto") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+
+        OutlinedTextField(
+            value = uiState.responsable,
+            onValueChange = { mvvm.onChangeAñadir(uiState.proyecto, uiState.centro, it) },
+            label = { Text("Responsable del Proyecto") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+
+        Button(
+            onClick = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val nuevoProyecto = Proyecto(
+                        proyecto = uiState.proyecto,
+                        centro = uiState.centro,
+                        responsable = uiState.responsable
+                    )
+                    mvvm.agregarProyecto(nuevoProyecto)
+                }
+            },
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text("Añadir Proyecto")
+        }
+    }
+}*/

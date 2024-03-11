@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.dam2jms.factoriaproyectosfp24retrofit.models.ViewModelHome
+import com.dam2jms.factoriaproyectosfp24retrofit.models.ViewModelLogin
 import com.dam2jms.factoriaproyectosfp24retrofit.navigation.AppScreens
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -118,7 +119,7 @@ fun homeScreenBody(modifier: Modifier, navController: NavController, mvvm: ViewM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, mvvm: ViewModelHome) {
+fun HomeScreen(navController: NavController, mvvm: ViewModelHome, loginViewModel: ViewModelLogin) {
     var proyectos by remember { mutableStateOf<List<Proyecto>>(emptyList()) }
     val uiState by mvvm.uiState.collectAsState()
 
@@ -143,12 +144,16 @@ fun HomeScreen(navController: NavController, mvvm: ViewModelHome) {
         },
         bottomBar = {
             BottomAppBar {
-                Button(onClick = { navController.navigate(route = AppScreens.AñadirProyecto.route) }) {
-                    Text("Añadir")
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { /* código para eliminar un proyecto en el servidor */ }) {
-                    Text("Eliminar")
+                // Deshabilita el botón de añadir para los usuarios invitados
+                if (loginViewModel.isLoggedIn.value) {
+                    Button(onClick = { navController.navigate(route = AppScreens.AñadirProyecto.route) }) {
+                        Text("Añadir")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    // Deshabilita el botón de eliminar para los usuarios invitados
+                    Button(onClick = { /* código para eliminar un proyecto en el servidor */ }) {
+                        Text("Eliminar")
+                    }
                 }
             }
         }
@@ -175,9 +180,10 @@ fun homeScreenBody(modifier: Modifier, navController: NavController, mvvm: ViewM
                     Column(
                         modifier = Modifier.padding(16.dp)
                     ) {
-                        Text(text = "Proyecto: ${proyectos[proyecto].proyecto}")
-                        Text(text = "Centro: ${proyectos[proyecto].centro}")
-                        Text(text = "Responsable: ${proyectos[proyecto].responsable}")
+                        Text(text = "Proyecto: ${proyectos[proyecto].nombreProyecto}")
+                        Text(text = "Descripción: ${proyectos[proyecto].descripcion}")
+                        Text(text = "Estado: ${proyectos[proyecto].estado}")
+                        Text(text = "Contacto: ${proyectos[proyecto].contacto}")
                     }
                 }
             }

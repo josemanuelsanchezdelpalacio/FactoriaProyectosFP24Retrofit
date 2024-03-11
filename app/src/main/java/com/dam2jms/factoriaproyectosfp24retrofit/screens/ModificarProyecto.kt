@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AñadirProyecto(navController: NavController, mvvm: ViewModelHome) {
+fun ModificarProyecto(navController: NavController, mvvm: ViewModelHome) {
     val uiState by mvvm.uiState.collectAsState()
 
     Scaffold(
@@ -59,12 +59,12 @@ fun AñadirProyecto(navController: NavController, mvvm: ViewModelHome) {
             )
         },
     ) { paddingValues ->
-        añadirProyectoBody(modifier = Modifier.padding(paddingValues), navController, mvvm, uiState)
+        modificarProyectoBody(modifier = Modifier.padding(paddingValues), navController, mvvm, uiState)
     }
 }
 
 @Composable
-fun añadirProyectoBody(modifier: Modifier, navController: NavController, mvvm: ViewModelHome, uiState: UiState) {
+fun modificarProyectoBody(modifier: Modifier, navController: NavController, mvvm: ViewModelHome, uiState: UiState) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -72,8 +72,17 @@ fun añadirProyectoBody(modifier: Modifier, navController: NavController, mvvm: 
         verticalArrangement = Arrangement.Center
     ) {
         OutlinedTextField(
+            value = uiState.ID,
+            onValueChange = { mvvm.onChangeModificar(it, uiState.nombreProyecto, uiState.descripcion, uiState.estado, uiState.contacto) },
+            label = { Text("ID del Proyecto") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+
+        OutlinedTextField(
             value = uiState.nombreProyecto,
-            onValueChange = { mvvm.onChangeAñadir(it, uiState.descripcion, uiState.estado, uiState.contacto) },
+            onValueChange = { mvvm.onChangeModificar(uiState.ID, it, uiState.descripcion, uiState.estado, uiState.contacto) },
             label = { Text("Nombre del Proyecto") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,7 +91,7 @@ fun añadirProyectoBody(modifier: Modifier, navController: NavController, mvvm: 
 
         OutlinedTextField(
             value = uiState.descripcion,
-            onValueChange = { mvvm.onChangeAñadir(uiState.nombreProyecto, it, uiState.estado, uiState.contacto) },
+            onValueChange = { mvvm.onChangeModificar(uiState.ID, uiState.nombreProyecto, it, uiState.estado, uiState.contacto) },
             label = { Text("Descripción del Proyecto") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -91,7 +100,7 @@ fun añadirProyectoBody(modifier: Modifier, navController: NavController, mvvm: 
 
         OutlinedTextField(
             value = uiState.estado,
-            onValueChange = { mvvm.onChangeAñadir(uiState.nombreProyecto, uiState.descripcion, it, uiState.contacto) },
+            onValueChange = { mvvm.onChangeModificar(uiState.ID, uiState.nombreProyecto, uiState.descripcion, it, uiState.contacto) },
             label = { Text("Estado del Proyecto") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -100,7 +109,7 @@ fun añadirProyectoBody(modifier: Modifier, navController: NavController, mvvm: 
 
         OutlinedTextField(
             value = uiState.contacto,
-            onValueChange = { mvvm.onChangeAñadir(uiState.nombreProyecto, uiState.descripcion, uiState.estado, it) },
+            onValueChange = { mvvm.onChangeModificar(uiState.ID, uiState.nombreProyecto, uiState.descripcion, uiState.estado, it) },
             label = { Text("Contacto del Proyecto") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -109,84 +118,19 @@ fun añadirProyectoBody(modifier: Modifier, navController: NavController, mvvm: 
 
         Button(
             onClick = {
-                //creo un nuevo proyecto con los datos de los EditText
-                val nuevoProyecto = Proyecto(
+                val proyectoModificado = Proyecto(
+                    id = uiState.ID,
                     nombreProyecto = uiState.nombreProyecto,
                     descripcion = uiState.descripcion,
                     estado = uiState.estado,
                     contacto = uiState.contacto
                 )
 
-                mvvm.agregarProyecto(nuevoProyecto)
+                mvvm.modificarProyecto(uiState.ID, proyectoModificado)
             },
             modifier = Modifier.padding(16.dp)
         ) {
-            Text("Añadir Proyecto")
+            Text("Modificar Proyecto")
         }
     }
 }
-
-
-
-/*@Composable
-fun añadirProyectoBody(modifier: Modifier, navController: NavController, mvvm: ViewModelHome, uiState: UiState) {
-
-    //observo el resultado y navega hacia atras si es exitoso
-    val agregarProyectoResult by mvvm.agregarProyectoResult.observeAsState()
-
-    //compruebo el resultado y navega hacia atrás si es exitoso
-    agregarProyectoResult?.let { resultado ->
-        if (resultado) {
-            navController.navigateUp()
-        } else { }
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        OutlinedTextField(
-            value = uiState.proyecto,
-            onValueChange = { mvvm.onChangeAñadir(it, uiState.centro, uiState.responsable) },
-            label = { Text("Nombre del Proyecto") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
-
-        OutlinedTextField(
-            value = uiState.centro,
-            onValueChange = { mvvm.onChangeAñadir(uiState.proyecto, it, uiState.responsable) },
-            label = { Text("Centro del Proyecto") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
-
-        OutlinedTextField(
-            value = uiState.responsable,
-            onValueChange = { mvvm.onChangeAñadir(uiState.proyecto, uiState.centro, it) },
-            label = { Text("Responsable del Proyecto") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
-
-        Button(
-            onClick = {
-                CoroutineScope(Dispatchers.IO).launch {
-                    val nuevoProyecto = Proyecto(
-                        proyecto = uiState.proyecto,
-                        centro = uiState.centro,
-                        responsable = uiState.responsable
-                    )
-                    mvvm.agregarProyecto(nuevoProyecto)
-                }
-            },
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text("Añadir Proyecto")
-        }
-    }
-}*/

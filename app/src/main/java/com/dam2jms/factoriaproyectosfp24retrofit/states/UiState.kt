@@ -11,8 +11,9 @@ data class UiState(
     var repeat_password: String = "",
     val auth: FirebaseAuth = Firebase.auth,
 
-    var proyecto: String = "",
-    var centro: String = "",
-    var responsable: String = "",
-    var listaProyectos: List<Proyecto> = listOf()
+    var ID: String = "",
+    var nombreProyecto: String = "",
+    var descripcion: String = "",
+    var estado: String = "",
+    var contacto: String = ""
 )

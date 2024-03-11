@@ -66,12 +66,15 @@ class ViewModelHome : ViewModel() {
         }
     }
 
-    suspend fun agregarProyecto(proyecto: Proyecto) {
-        try {
-            Firebase.firestore.collection("proyectos").add(proyecto).await()
-        } catch (exception: Exception) {
-            exception.printStackTrace()
-        }
-    }
 
+    fun agregarProyecto(proyecto: Proyecto) {
+        db.collection("proyectos")
+            .add(proyecto)
+            .addOnSuccessListener {
+                // Puedes realizar acciones adicionales después de agregar un proyecto (opcional)
+            }
+            .addOnFailureListener { exception ->
+                exception.printStackTrace()
+            }
+    }
 }
